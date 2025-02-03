@@ -3,7 +3,9 @@ name: wa-connector
 
 services:
   wa-connector:
-    image: wa-connector:latest
+    build:
+      context: .  # Path to the directory containing the Dockerfile
+      dockerfile: Dockerfile 
     container_name: wa-connector
     ports:
       - "5007:5007"
