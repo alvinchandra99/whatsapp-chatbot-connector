@@ -12,6 +12,7 @@ const schema = z
     REDIS_URL: z.string().default("redis://localhost:6379"),
     GRAPH_API_TOKEN: z.string().default(""),
     BUSINESS_PHONE_NUMBER_ID: z.string().default(""),
+    WHATSAPP_BUSINESS_ACCOUNT_ID: z.string().default(""),
     CONNECTION_PLATFORM: z.enum(["dify", "rasa"]).default("dify"),
     DIFY_BASE_URL: z.string().default("https://api.dify.ai/v1"),
     DIFY_API_KEY: z.string(),
@@ -21,6 +22,7 @@ const schema = z
       .default("http://localhost:5005/webhooks/rest/webhook"),
     RASA_TIMEOUT: z.coerce.number().default(30_000),
     WA_TIMEOUT: z.coerce.number().default(30_000),
+    PHONE_NUMBER: z.string().default(""),
   })
   .transform((env) => {
     const redisUrl = new URL(env.REDIS_URL);

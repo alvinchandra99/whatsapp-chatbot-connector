@@ -14,6 +14,8 @@ const {
   BUSINESS_PHONE_NUMBER_ID,
   CONNECTION_PLATFORM,
   WA_TIMEOUT,
+  PHONE_NUMBER,
+  WHATSAPP_BUSINESS_ACCOUNT_ID
 } = config;
 
 const BASE_URL = `https://graph.facebook.com/v19.0/${BUSINESS_PHONE_NUMBER_ID}`;
@@ -38,22 +40,19 @@ export const sendChatbotReply = async ({
 }) => {
   switch (chatbotReply?.type) {
     case "interactive-button":
-      await sendInteractiveReplyButton({
+      return await sendInteractiveReplyButton({
         to,
         text: chatbotReply.text,
         buttons: chatbotReply.buttons,
       });
-      break;
     case "interactive-list":
-      await sendInteractiveListMessage({
+      return await sendInteractiveListMessage({
         to,
         text: chatbotReply.text,
         rows: chatbotReply.rows,
       });
-      break;
     default:
-      await sendTextMessage({ to, text: chatbotReply.text });
-      break;
+      return await sendTextMessage({ to, text: chatbotReply.text });
   }
 };
 
@@ -221,7 +220,57 @@ export const _queryAndReply = async (payloadString: string) => {
   }
 
   try {
-    await sendChatbotReply({ to: messageFrom, chatbotReply });
+    const whatsappResponse = await sendChatbotReply({ to: messageFrom, chatbotReply });
+
+    if (whatsappResponse && whatsappResponse.data) {
+      console.log("WhatsApp response:", whatsappResponse.data);
+
+      // Forward the WhatsApp response to Chatwoot
+      try {
+        const chatwootResponse = await axios.post(
+          `https://chat.solvea.id/webhooks/whatsapp/${PHONE_NUMBER}`,
+          {
+            "object": "whatsapp_business_account",
+            "entry": [
+              {
+                "id": WHATSAPP_BUSINESS_ACCOUNT_ID,
+                "changes": [
+                  {
+                    "field": "message_echoes",
+                    "value": {
+                      "messaging_product": "whatsapp",
+                      "metadata": {
+                        "display_phone_number": PHONE_NUMBER,
+                        "phone_number_id": BUSINESS_PHONE_NUMBER_ID
+                      },
+                      "message_echoes": [
+                        {
+                          "from": PHONE_NUMBER,
+                          "to": messageFrom,
+                          "id": whatsappResponse.data.messages[0].id,
+                          "timestamp": Math.floor(Date.now() / 1000),
+                          "type": "text",
+                          "text": {
+                            "body": chatbotReply
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        );
+        console.log(
+          `[Chatwoot] Forwarded WhatsApp response to Chatwoot with status: ${chatwootResponse.status}`
+        );
+      } catch (error) {
+        console.error("[Chatwoot] Error forwarding WhatsApp response:", error);
+      }
+    } else {
+      console.error("WhatsApp response is undefined or missing data.");
+    }
   } catch (error) {
     console.error("Error sendChatbotReply: " + error);
     console.error((error as AxiosError)?.response?.data);
