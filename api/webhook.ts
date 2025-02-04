@@ -76,7 +76,7 @@ webhookRoutes.post("/", async (req, res) => {
   // Forward the request to Chatwoot
   try {
     const chatwootResponse = await axios.post(
-      `https://app.chatwoot.com/webhooks/whatsapp/+${PHONE_NUMBER}`,
+      `https://chat.solvea.id/webhooks/whatsapp/${PHONE_NUMBER}`,
       {
         message: message.text?.body,
         type: message.type,
