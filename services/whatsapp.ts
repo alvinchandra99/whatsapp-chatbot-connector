@@ -222,7 +222,7 @@ export const _queryAndReply = async (payloadString: string) => {
   try {
     const whatsappResponse = await sendChatbotReply({ to: messageFrom, chatbotReply });
 
-    console.log("WhatsApp response:", whatsappResponse);
+    console.log("WhatsApp response:", whatsappResponse.data);
     if (whatsappResponse && whatsappResponse.data) {
       // Forward the WhatsApp response to Chatwoot
       try {
