@@ -43,6 +43,23 @@ webhookRoutes.get("/", (req, res) => {
 });
 
 webhookRoutes.post("/", async (req, res) => {
+  console.log("Received POST request at /webhook");
+  console.log("Request body: ", JSON.stringify(req.body, null, 2));
+
+  // Forward the entire request body to Chatwoot
+  try {
+    console.log("Forwarding entire payload to Chatwoot");
+    const chatwootResponse = await axios.post(
+      `https://chat.solvea.id/webhooks/whatsapp/${PHONE_NUMBER}`,
+      req.body
+    );
+    console.log(
+      `[Chatwoot] Forwarded payload to Chatwoot with status: ${chatwootResponse.status}`
+    );
+  } catch (error) {
+    console.error("[Chatwoot] Error forwarding payload:", error);
+  }
+
   // check if the webhook request contains a message
   // details on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
   const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
