@@ -3,12 +3,13 @@ import dotenv from "dotenv";
 import { Queue } from "bullmq";
 import { config } from "../utils/config";
 import { _markChatAsRead, _queryAndReply } from "../services/whatsapp";
+import axios from "axios";
 
 dotenv.config();
 
 const webhookRoutes = express.Router();
 
-const { WEBHOOK_VERIFY_TOKEN, CONNECTION_PLATFORM, SESSION_DATABASE } =
+const { WEBHOOK_VERIFY_TOKEN, CONNECTION_PLATFORM, SESSION_DATABASE, PHONE_NUMBER} =
   process.env;
 
 console.log("CONNECTION_PLATFORM: ", CONNECTION_PLATFORM);
@@ -71,6 +72,22 @@ webhookRoutes.post("/", async (req, res) => {
   console.log(
     `[Incoming webhook message] phone: ${message.from} - text-body: ${message.text?.body} - message-type: ${message.type}`
   );
+
+  // Forward the request to Chatwoot
+  try {
+    const chatwootResponse = await axios.post(
+      `https://app.chatwoot.com/webhooks/whatsapp/+${PHONE_NUMBER}`,
+      {
+        message: message.text?.body,
+        type: message.type,
+      }
+    );
+    console.log(
+      `[Chatwoot] Forwarded message to Chatwoot with status: ${chatwootResponse.status}`
+    );
+  } catch (error) {
+    console.error("[Chatwoot] Error forwarding message:", error);
+  }
 
   // get the query text by message.type
   let queryText = "";
