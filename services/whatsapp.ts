@@ -222,48 +222,48 @@ export const _queryAndReply = async (payloadString: string) => {
   try {
     const whatsappResponse = await sendChatbotReply({ to: messageFrom, chatbotReply });
 
+    console.log("WhatsApp response:", whatsappResponse);
     if (whatsappResponse && whatsappResponse.data) {
-      console.log("WhatsApp response:", whatsappResponse.data);
-
       // Forward the WhatsApp response to Chatwoot
       try {
+        let messageEchos = {
+          "object": "whatsapp_business_account",
+          "entry": [
+            {
+              "id": WHATSAPP_BUSINESS_ACCOUNT_ID,
+              "changes": [
+                {
+                  "field": "message_echoes",
+                  "value": {
+                    "messaging_product": "whatsapp",
+                    "metadata": {
+                      "display_phone_number": PHONE_NUMBER,
+                      "phone_number_id": BUSINESS_PHONE_NUMBER_ID
+                    },
+                    "message_echoes": [
+                      {
+                        "from": PHONE_NUMBER,
+                        "to": messageFrom,
+                        "id": whatsappResponse.data.messages[0].id,
+                        "timestamp": Math.floor(Date.now() / 1000),
+                        "type": "text",
+                        "text": {
+                          "body": chatbotReply
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
         const chatwootResponse = await axios.post(
           `https://chat.solvea.id/webhooks/whatsapp/${PHONE_NUMBER}`,
-          {
-            "object": "whatsapp_business_account",
-            "entry": [
-              {
-                "id": WHATSAPP_BUSINESS_ACCOUNT_ID,
-                "changes": [
-                  {
-                    "field": "message_echoes",
-                    "value": {
-                      "messaging_product": "whatsapp",
-                      "metadata": {
-                        "display_phone_number": PHONE_NUMBER,
-                        "phone_number_id": BUSINESS_PHONE_NUMBER_ID
-                      },
-                      "message_echoes": [
-                        {
-                          "from": PHONE_NUMBER,
-                          "to": messageFrom,
-                          "id": whatsappResponse.data.messages[0].id,
-                          "timestamp": Math.floor(Date.now() / 1000),
-                          "type": "text",
-                          "text": {
-                            "body": chatbotReply
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            ]
-          }
+          messageEchos
         );
         console.log(
-          `[Chatwoot] Forwarded WhatsApp response to Chatwoot with status: ${chatwootResponse.status}`
+          `[Chatwoot] Forwarded WhatsApp response to Chatwoot with status: ${chatwootResponse.status} and messageEchos: ${JSON.stringify(messageEchos)}`
         );
       } catch (error) {
         console.error("[Chatwoot] Error forwarding WhatsApp response:", error);
