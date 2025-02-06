@@ -253,7 +253,7 @@ export const _queryAndReply = async (payloadString: string) => {
                         "from": PHONE_NUMBER.replace(/^\+/, ""),
                         // "to": messageFrom,
                         "id": whatsappResponse.data.messages[0].id,
-                        "timestamp": Math.floor(Date.now() / 1000),
+                        "timestamp": Math.floor(Date.now() / 1000).toString,
                         "type": "text",
                         "text": {
                           "body": chatbotReply.text
