@@ -237,20 +237,20 @@ export const _queryAndReply = async (payloadString: string) => {
                   "value": {
                     "messaging_product": "whatsapp",
                     "metadata": {
-                      "display_phone_number": PHONE_NUMBER,
+                      "display_phone_number": PHONE_NUMBER.replace(/^\+/, ""),
                       "phone_number_id": BUSINESS_PHONE_NUMBER_ID
                     },
                     "contacts":[
                       {
                         "profile": {
-                          "name": PHONE_NUMBER
+                          "name": messageFrom
                         },
-                        "wa_id": PHONE_NUMBER
+                        "wa_id": messageFrom
                       }
                     ],
                     "messages": [
                       {
-                        "from": PHONE_NUMBER,
+                        "from": PHONE_NUMBER.replace(/^\+/, ""),
                         // "to": messageFrom,
                         "id": whatsappResponse.data.messages[0].id,
                         "timestamp": Math.floor(Date.now() / 1000),
