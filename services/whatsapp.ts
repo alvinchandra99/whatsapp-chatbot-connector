@@ -240,6 +240,14 @@ export const _queryAndReply = async (payloadString: string) => {
                       "display_phone_number": PHONE_NUMBER,
                       "phone_number_id": BUSINESS_PHONE_NUMBER_ID
                     },
+                    "contacts":[
+                      {
+                        "profile": {
+                          "name": PHONE_NUMBER
+                        },
+                        "wa_id": PHONE_NUMBER
+                      }
+                    ],
                     "messages": [
                       {
                         "from": PHONE_NUMBER,
