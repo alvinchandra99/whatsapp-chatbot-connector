@@ -10,6 +10,7 @@ const schema = z
       .default("development"),
     SESSION_DATABASE: z.enum(["in-memory", "redis"]).default("in-memory"),
     REDIS_URL: z.string().default("redis://localhost:6379"),
+    REDIS_PASSWORD: z.string().default(""),
     GRAPH_API_TOKEN: z.string().default(""),
     BUSINESS_PHONE_NUMBER_ID: z.string().default(""),
     WHATSAPP_BUSINESS_ACCOUNT_ID: z.string().default(""),

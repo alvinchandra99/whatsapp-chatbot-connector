@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 import { config } from "../config";
 
-const redis = createClient({ url: config.REDIS_URL });
+const redis = createClient({ url: config.REDIS_URL, password:REDIS_PASSWORD });
 
 if (config.SESSION_DATABASE === "redis") {
   redis.on("error", (err) => console.error("Redis Client Error", err));
