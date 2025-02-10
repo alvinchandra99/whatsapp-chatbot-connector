@@ -11,4 +11,19 @@ services:
       - "5007:5007"
     env_file:
       - .env # Load environment variables from the .env file
+    depends_on:
+      - redis
 
+# The redis cache.
+  redis:
+    image: redis:6-alpine
+    restart: always
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD:-123456}
+    volumes:
+      # Mount the redis data directory to the container.
+      - ./volumes/redis/data:/data
+    # Set the redis password when startup redis server.
+    command: redis-server --requirepass ${REDIS_PASSWORD:-123456}
+    healthcheck:
+      test: [ 'CMD', 'redis-cli', 'ping' ]

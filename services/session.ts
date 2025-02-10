@@ -9,7 +9,7 @@ const schema = z.object({
   conversationId: z.string(),
 });
 
-const ttlInSeconds = 3600 * 24 ; // 24 hour
+const ttlInSeconds = 1 ; // 24 hour
 
 type Session = z.input<typeof schema>;
 
