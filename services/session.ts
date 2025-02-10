@@ -9,6 +9,8 @@ const schema = z.object({
   conversationId: z.string(),
 });
 
+const ttlInSeconds = 3600 * 24 ; // 24 hour
+
 type Session = z.input<typeof schema>;
 
 const inMemory = new InMemoryDatabase<Session>();
@@ -17,8 +19,9 @@ export async function setSession(session: Session) {
   if (config.SESSION_DATABASE === "in-memory") {
     inMemory.set(session.waId, session);
   } else if (config.SESSION_DATABASE === "redis") {
-    await redis.set(session.waId, JSON.stringify(session));
-  }
+    await redis.set(session.waId, JSON.stringify(session), {
+      EX: ttlInSeconds,
+    });  }
 }
 
 export async function getSession(waId: Session["waId"]) {
