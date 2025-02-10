@@ -27,3 +27,5 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD:-123456}
     healthcheck:
       test: [ 'CMD', 'redis-cli', 'ping' ]
+    env_file:
+      - .env # Load environment variables from the .env file
